@@ -1,6 +1,7 @@
 use std::fmt;
 use std::fmt::Formatter;
 use serde::{Deserialize, Serialize};
+use clap::Parser;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RememberEntity {
@@ -28,9 +29,22 @@ pub struct ConfigFile {
 }
 
 pub struct Command {
-    pub command: String,
-    pub argument1: String,
-    pub argument2: String,
-    pub argument3: String,
+    pub method: String,
+    pub title: String,
+    pub description: String,
+    pub cmds: String,
     pub pwd: String
+}
+
+#[derive(Parser, Debug)]
+#[command(author="yellowhatpro", version="1", about="A cli tool for cli fans", long_about=None)]
+pub struct CmdArgs {
+    #[arg(short,long)]
+    pub method: String,
+    #[arg(short, long, default_value = "")]
+    pub title: String,
+    #[arg(short,long, default_value = "")]
+    pub description: String,
+    #[arg(short,long, default_value = "")]
+    pub cmds: String,
 }

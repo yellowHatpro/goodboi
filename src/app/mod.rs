@@ -4,12 +4,12 @@ use crate::utils;
 pub fn start() {
     utils::init();
     let args = utils::get_args();
-    match args.command.as_str() {
+    match args.method.as_str() {
         "start" => start_listening(),
         "end" => end_listening(),
-        "add" => add(args.argument1, args.argument2, args.argument3, args.pwd),
+        "add" => add(args.title, args.description, args.cmds, args.pwd),
         "list" => list(),
-        "remove" => delete(args.argument1),
+        "remove" => delete(args.title),
         "q" => std::process::exit(0),
         _ => {}
     }

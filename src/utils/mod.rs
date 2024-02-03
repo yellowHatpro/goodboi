@@ -5,6 +5,8 @@ use serde_json::from_str;
 use serde_json::Result;
 use std::{env, fs, io::Write};
 use std::string::ToString;
+use clap::Parser;
+use crate::structs::CmdArgs;
 
 const DATA_FILE: &'static str = "/home/yellowhatpro/.i-remember/data.json";
 
@@ -34,19 +36,16 @@ pub fn init() {
 }
 
 pub fn get_args() -> structs::Command {
-    let args = std::env::args().collect::<Vec<String>>(); // get args and collect them to a vector
-    let command = args.get(1).unwrap_or(&"".to_string()).to_string();
-    let argument1 = args.get(2).unwrap_or(&"".to_string()).to_string();
-    let argument2 = args.get(3).unwrap_or(&"".to_string()).to_string();
-    let argument3 = args.get(4).unwrap_or(&"".to_string()).to_string();
+
+    let args = CmdArgs::parse();
 
     let current_dir = env::current_dir().unwrap().to_string_lossy().to_string();
 
     structs::Command {
-        command,
-        argument1,
-        argument2,
-        argument3,
+        method: args.method,
+        title: args.title,
+        description: args.description,
+        cmds: args.cmds,
         pwd: current_dir
     }
 }
