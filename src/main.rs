@@ -6,4 +6,3 @@ mod utils;
 fn main() {
     app::start();
 }
-
