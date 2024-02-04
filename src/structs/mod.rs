@@ -84,7 +84,8 @@ pub struct FetchCommand{
 }
 #[derive(Debug, Args)]
 pub struct RecentCommand{
-
+    /// How many recent commands you want to see
+    pub number_of_lines: usize
 }
 #[derive(Debug, Args)]
 pub struct StartListeningCommand{

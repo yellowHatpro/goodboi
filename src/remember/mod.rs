@@ -1,4 +1,4 @@
-use crate::structs::{RememberEntity, RemoveCommand, SaveCommand};
+use crate::structs::{RecentCommand, RememberEntity, RemoveCommand, SaveCommand};
 use crate::utils;
 use colorize::*;
 use crate::utils::get_pwd;
@@ -38,6 +38,13 @@ pub fn list() {
         println!("{}", re);
         println!("--------------------------------------------");
     }
+}
+
+pub fn handle_recent_commands(rc: RecentCommand){
+    utils::read_from_sh_history(rc.number_of_lines)
+        .iter()
+        .for_each(|x|
+            println!("{}", x.clone().green()))
 }
 
 pub fn start_listening() {

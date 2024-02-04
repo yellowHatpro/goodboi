@@ -11,7 +11,7 @@ pub fn start() {
         Save(command) => handle_save_remember_entity(command),
         Sync => {}
         Fetch(_) => {}
-        Recent(_) => {}
+        Recent(number_of_lines) => handle_recent_commands(number_of_lines),
         StartListening => {}
         StopListening => {}
         Remove(id) => handle_delete_remember_entity(id)
