@@ -1,9 +1,11 @@
-use crate::structs::RememberEntity;
+use crate::structs::{RememberEntity, RemoveCommand, SaveCommand};
 use crate::utils;
 use colorize::*;
+use crate::utils::get_pwd;
 
-pub fn add(title: String, description: String, cmd: String, pwd: String) {
-    if title.len() < 1 || description.len() < 1 || cmd.len() < 1 {
+pub fn handle_save_remember_entity(save_command: SaveCommand) {
+    let pwd = get_pwd();
+    if save_command.title.len() < 1 || save_command.description.len() < 1 || save_command.cmd.len() < 1 {
         println!("{}", "Please provide some value".red());
         return;
     }
@@ -14,9 +16,9 @@ pub fn add(title: String, description: String, cmd: String, pwd: String) {
 
 
     let re = RememberEntity {
-        title,
-        cmds: vec![cmd],
-        description,
+        title: save_command.title,
+        cmds: vec![save_command.cmd],
+        description: save_command.description,
         id: utils::get_id(),
         pwd,
     };
@@ -26,7 +28,7 @@ pub fn add(title: String, description: String, cmd: String, pwd: String) {
 }
 
 pub fn list() {
-    let remember_entities = utils::get_remember_entities().unwrap();
+    let remember_entities = utils::get_remember_entities().unwrap_or_else(|_| vec![]);
 
     if remember_entities.len() == 0 {
         println!("{}", "No commands".red());
@@ -45,7 +47,8 @@ pub fn end_listening() {
     //TODO
 }
 
-pub fn delete(id: String) {
+pub fn handle_delete_remember_entity(id: RemoveCommand) {
+    let id = id.id;
     let mut remember_entities = match utils::get_remember_entities() {
         Ok(remember_entities) => {remember_entities}
         Err(_) => {vec![]}
@@ -54,7 +57,7 @@ pub fn delete(id: String) {
     let id = id.parse::<u32>().unwrap_or(0).to_string();
     let exists = remember_entities.iter().any(|re| re.id == id);
     if !exists {
-        println!("{}", "Key Value pair not found".red());
+        println!("{}", "Remembered entity not found".red());
         return;
     }
     remember_entities.retain(|re| re.id != id);

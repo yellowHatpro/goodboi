@@ -5,8 +5,6 @@ use serde_json::from_str;
 use serde_json::Result;
 use std::{env, fs, io::Write};
 use std::string::ToString;
-use clap::Parser;
-use crate::structs::CmdArgs;
 
 const DATA_FILE: &'static str = "/home/yellowhatpro/.i-remember/data.json";
 
@@ -35,19 +33,8 @@ pub fn init() {
     }
 }
 
-pub fn get_args() -> structs::Command {
-
-    let args = CmdArgs::parse();
-
-    let current_dir = env::current_dir().unwrap().to_string_lossy().to_string();
-
-    structs::Command {
-        method: args.method,
-        title: args.title,
-        description: args.description,
-        cmds: args.cmds,
-        pwd: current_dir
-    }
+pub fn get_pwd() ->String {
+    env::current_dir().unwrap().to_string_lossy().to_string()
 }
 
 pub fn get_id() -> String {
