@@ -1,4 +1,4 @@
-use crate::structs::{RecentCommand, RememberEntity, RemoveCommand, SaveCommand};
+use crate::structs::{RecentCommand, RememberEntity, RemoveCommand, RunCommand, SaveCommand, SearchCommand};
 use crate::utils;
 use colorize::*;
 use crate::utils::get_pwd;
@@ -47,11 +47,16 @@ pub fn handle_recent_commands(rc: RecentCommand){
             println!("{}", x.clone().green()))
 }
 
-pub fn start_listening() {
-    //TODO
+pub fn handle_run_command(id: RunCommand) {
 }
-pub fn end_listening() {
-    //TODO
+
+pub fn handle_search_command(id: SearchCommand) {
+    let id = id.id;
+    let mut remember_entities = match utils::get_remember_entities() {
+        Ok(remember_entities) => {remember_entities}
+        Err(_) => {vec![]}
+    };
+
 }
 
 pub fn handle_delete_remember_entity(id: RemoveCommand) {

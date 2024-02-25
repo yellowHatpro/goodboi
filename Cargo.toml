@@ -12,3 +12,6 @@ chrono = "0.4.22"
 colorize = "0.1.0"
 rand = "0.8.5"
 clap = { version = "4.4.18", features = ["derive"] }
+
+[dependencies.i-remember-structs]
+path = "i-remember-structs"

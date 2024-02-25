@@ -1,27 +1,6 @@
-use std::fmt;
-use std::fmt::Formatter;
 use serde::{Deserialize, Serialize};
 use clap::{Parser, Subcommand, Args};
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct RememberEntity {
-    pub id: String,
-    pub title: String,
-    pub cmds: Vec<String>,
-    pub description: String,
-    pub pwd: String
-}
-
-impl fmt::Display for RememberEntity {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        writeln!(f, "ID: {}", self.id)?;
-        writeln!(f, "Title: {}", self.title)?;
-        writeln!(f, "Commands: {:?}", self.cmds)?;
-        writeln!(f, "Description: {}", self.description)?;
-        writeln!(f, "Directory where the command was used: {}", self.pwd)?;
-        Ok(())
-    }
-}
+use i_remember_structs::RememberEntity;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigFile {
@@ -57,15 +36,15 @@ pub enum EntityType{
     /// Sync commands from remote storage
     Sync,
     /// Fetch commands from remote storage
-    Fetch(FetchCommand),
+    Fetch,
     /// Save recent commands
     Recent(RecentCommand),
-    /// Start registering commands
-    StartListening,
-    /// Stop registering commands
-    StopListening,
+    /// Run a Remembered Entity
+    Run(RunCommand),
     /// Remove a remembered entity
     Remove(RemoveCommand),
+    /// Search a remembered entity
+    Search(SearchCommand)
 }
 
 #[derive(Debug, Args)]
@@ -77,26 +56,24 @@ pub struct SaveCommand{
     /// Command that you want to save
     pub cmd: String
 }
-
-#[derive(Debug, Args)]
-pub struct FetchCommand{
-
-}
 #[derive(Debug, Args)]
 pub struct RecentCommand{
     /// How many recent commands you want to see
     pub number_of_lines: usize
 }
 #[derive(Debug, Args)]
-pub struct StartListeningCommand{
-
-}
-#[derive(Debug, Args)]
-pub struct StopListeningCommand{
-
+pub struct RunCommand {
+    ///ID of the remembered entity
+    pub id: String
 }
 #[derive(Debug, Args)]
 pub struct RemoveCommand{
     /// id of the remembered command
- pub id: String
+    pub id: String
+}
+
+#[derive(Debug, Args)]
+pub struct SearchCommand{
+    /// id of the remembered command
+    pub id: String
 }

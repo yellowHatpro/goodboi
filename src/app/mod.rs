@@ -10,10 +10,10 @@ pub fn start() {
         List => list(),
         Save(command) => handle_save_remember_entity(command),
         Sync => {}
-        Fetch(_) => {}
+        Fetch => {}
         Recent(number_of_lines) => handle_recent_commands(number_of_lines),
-        StartListening => {}
-        StopListening => {}
-        Remove(id) => handle_delete_remember_entity(id)
+        Run(id) =>  handle_run_command(id),
+        Remove(id) => handle_delete_remember_entity(id),
+        Search(id) => handle_search_command(id)
     }
 }
