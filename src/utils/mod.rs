@@ -1,13 +1,14 @@
-use crate::structs;
+use crate::{structs};
 use colorize::*;
 use rand::prelude::*;
-use serde_json::from_str;
+use serde_json::{ from_str};
 use serde_json::Result;
 use std::{env, fs, io, io::Write};
 use std::collections::VecDeque;
 use std::fs::File;
-use std::io::BufRead;
+use std::io::{BufRead};
 use std::string::ToString;
+use i_remember_structs::RememberEntity;
 
 const DATA_FILE: &'static str = "/home/yellowhatpro/.i-remember/data.json";
 
@@ -46,14 +47,41 @@ pub fn get_id() -> String {
     (id + rng.gen_range(1..1000)).to_string()
 }
 
-pub fn get_remember_entities() -> Result<Vec<structs::RememberEntity>> {
+pub fn get_remember_entities() -> Result<Vec<RememberEntity>> {
     let data = fs::read_to_string(DATA_FILE).unwrap();
     let remember_entities: structs::ConfigFile = from_str(&data)?;
 
     Ok(remember_entities.data)
 }
 
-pub fn save_remember_entities(remember_entities: Vec<structs::RememberEntity>) {
+pub fn get_remember_entity_by_id(id: String ) -> Result<RememberEntity> {
+    let remember_entities = match get_remember_entities() {
+        Ok(remember_entities) => {remember_entities}
+        Err(_) => {vec![]}
+    };
+    let re = remember_entities.iter()
+        .find(move |&remember_entity| remember_entity.id == id);
+    match re {
+        None => {
+            panic!("Could not find the entity")
+        }
+        Some(rem) => {
+            Ok(rem.to_owned())
+        }
+    }
+}
+
+pub fn execute_command(cmd: String) {
+    let output = std::process::Command::new(which_shell())
+        .arg("-c")
+        .arg(cmd)
+        .output().expect("df");
+    println!("status: {}", output.status);
+    io::stdout().write_all(&output.stdout).unwrap();
+    io::stderr().write_all(&output.stderr).unwrap();
+}
+
+pub fn save_remember_entities(remember_entities: Vec<RememberEntity>) {
     let config_file = structs::ConfigFile { data: remember_entities };
     let json = serde_json::to_string(&config_file).unwrap();
 

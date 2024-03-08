@@ -1,6 +1,7 @@
-use crate::structs::{RecentCommand, RememberEntity, RemoveCommand, RunCommand, SaveCommand, SearchCommand};
+use crate::structs::{RecentCommand, RemoveCommand, RunCommand, SaveCommand, SearchCommand};
 use crate::utils;
 use colorize::*;
+use i_remember_structs::RememberEntity;
 use crate::utils::get_pwd;
 
 pub fn handle_save_remember_entity(save_command: SaveCommand) {
@@ -36,7 +37,6 @@ pub fn list() {
     }
     for re in &remember_entities {
         println!("{}", re);
-        println!("--------------------------------------------");
     }
 }
 
@@ -48,15 +48,27 @@ pub fn handle_recent_commands(rc: RecentCommand){
 }
 
 pub fn handle_run_command(id: RunCommand) {
+    match utils::get_remember_entity_by_id(id.id) {
+        Ok(re) => {
+            for cmd in re.cmds {
+                utils::execute_command(cmd)
+            }
+        }
+        Err(_) => {
+            println!("{}", "No command".red())
+        }
+    }
 }
 
 pub fn handle_search_command(id: SearchCommand) {
-    let id = id.id;
-    let mut remember_entities = match utils::get_remember_entities() {
-        Ok(remember_entities) => {remember_entities}
-        Err(_) => {vec![]}
-    };
-
+    match utils::get_remember_entity_by_id(id.id) {
+        Ok(re) => {
+            println!("{}", re);
+        }
+        Err(_) => {
+            println!("{}", "No commands".red());
+        }
+    }
 }
 
 pub fn handle_delete_remember_entity(id: RemoveCommand) {

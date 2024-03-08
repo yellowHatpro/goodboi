@@ -18,6 +18,7 @@ impl fmt::Display for RememberEntity {
         writeln!(f, "Commands: {:?}", self.cmds)?;
         writeln!(f, "Description: {}", self.description)?;
         writeln!(f, "Directory where the command was used: {}", self.pwd)?;
+        println!("--------------------------------------------");
         Ok(())
     }
 }
