@@ -3,6 +3,7 @@ mod remember;
 mod structs;
 mod utils;
 
-fn main() {
-    app::start();
+#[tokio::main]
+async fn main() {
+    app::start().await;
 }

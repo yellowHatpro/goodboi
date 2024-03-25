@@ -8,6 +8,8 @@ use std::collections::VecDeque;
 use std::fs::File;
 use std::io::{BufRead};
 use std::string::ToString;
+use strsim::levenshtein;
+use uuid::Uuid;
 use i_remember_structs::RememberEntity;
 
 const DATA_FILE: &'static str = "/home/yellowhatpro/.i-remember/data.json";
@@ -69,6 +71,32 @@ pub fn get_remember_entity_by_id(id: String ) -> Result<RememberEntity> {
             Ok(rem.to_owned())
         }
     }
+}
+
+pub fn get_remember_entity_by_title(title: &str) -> Result<RememberEntity>{
+    let remember_entities = match get_remember_entities() {
+        Ok(remember_entities) => {remember_entities}
+        Err(_) => {vec![]}
+    };
+    if let Some(re) = find_closest_name(title, remember_entities) {
+        Ok(re)
+    } else {
+        panic!("Could not find the entity")
+    }
+}
+
+fn find_closest_name(input: &str, names: Vec<RememberEntity>) -> Option<RememberEntity> {
+    let mut closest_name = None;
+    let mut min_distance = usize::MAX;
+    
+    for re in names {
+        let distance = levenshtein(input, re.title.as_str());
+        if distance < min_distance {
+            min_distance = distance;
+            closest_name = Some(re.clone());
+        }
+    }
+    closest_name
 }
 
 pub fn execute_command(cmd: String) {

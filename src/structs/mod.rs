@@ -64,16 +64,16 @@ pub struct RecentCommand{
 #[derive(Debug, Args)]
 pub struct RunCommand {
     ///ID of the remembered entity
-    pub id: String
+    pub title: String
 }
 #[derive(Debug, Args)]
 pub struct RemoveCommand{
     /// id of the remembered command
-    pub id: String
+    pub title: String
 }
 
 #[derive(Debug, Args)]
 pub struct SearchCommand{
-    /// id of the remembered command
-    pub id: String
+    /// title of the remembered command
+    pub title: String
 }

@@ -1,6 +1,8 @@
 use crate::structs::{RecentCommand, RemoveCommand, RunCommand, SaveCommand, SearchCommand};
 use crate::utils;
 use colorize::*;
+use postgrest::Postgrest;
+use serde_json::json;
 use i_remember_structs::RememberEntity;
 use crate::utils::get_pwd;
 
@@ -47,9 +49,13 @@ pub fn handle_recent_commands(rc: RecentCommand){
             println!("{}", x.clone().green()))
 }
 
-pub fn handle_run_command(id: RunCommand) {
-    match utils::get_remember_entity_by_id(id.id) {
+pub fn handle_run_command(title: RunCommand) {
+    match utils::get_remember_entity_by_title(&title.title) {
         Ok(re) => {
+            if re.title!=title.title {
+             println!("{} {} {}", "Did you mean".yellow(), re.title.yellow(), "?".yellow());
+                return
+            }
             for cmd in re.cmds {
                 utils::execute_command(cmd)
             }
@@ -60,8 +66,8 @@ pub fn handle_run_command(id: RunCommand) {
     }
 }
 
-pub fn handle_search_command(id: SearchCommand) {
-    match utils::get_remember_entity_by_id(id.id) {
+pub fn handle_search_command(title: SearchCommand) {
+    match utils::get_remember_entity_by_title(&title.title) {
         Ok(re) => {
             println!("{}", re);
         }
@@ -71,20 +77,31 @@ pub fn handle_search_command(id: SearchCommand) {
     }
 }
 
-pub fn handle_delete_remember_entity(id: RemoveCommand) {
-    let id = id.id;
+pub fn handle_delete_remember_entity(title: RemoveCommand) {
+    let title = title.title;
     let mut remember_entities = match utils::get_remember_entities() {
         Ok(remember_entities) => {remember_entities}
         Err(_) => {vec![]}
     };
 
-    let id = id.parse::<u32>().unwrap_or(0).to_string();
-    let exists = remember_entities.iter().any(|re| re.id == id);
+    let exists = remember_entities.iter().any(|re| re.title == title);
     if !exists {
         println!("{}", "Remembered entity not found".red());
         return;
     }
-    remember_entities.retain(|re| re.id != id);
+    remember_entities.retain(|re| re.title != title);
     utils::save_remember_entities(remember_entities);
     println!("{}", "Removed command".green());
+}
+
+pub async fn handle_sync() {
+    let remember_entities = match utils::get_remember_entities() {
+        Ok(remember_entities) => {remember_entities}
+        Err(_) => {vec![]}
+    };
+    //TODO : What solution to consider, BaaS or ElephantDB
+}
+
+pub fn handle_fetch() {
+
 }
