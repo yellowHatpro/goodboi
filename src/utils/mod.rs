@@ -1,24 +1,20 @@
-use crate::{structs};
+use crate::structs;
 use colorize::*;
+use i_remember_structs::RememberEntity;
 use rand::prelude::*;
-use serde_json::{ from_str};
+use serde_json::from_str;
 use serde_json::Result;
-use std::{env, fs, io, io::Write};
 use std::collections::VecDeque;
 use std::fs::File;
-use std::io::{BufRead};
+use std::io::BufRead;
 use std::string::ToString;
+use std::{env, fs, io, io::Write};
 use strsim::levenshtein;
-use uuid::Uuid;
-use i_remember_structs::RememberEntity;
 
 const DATA_FILE: &'static str = "/home/yellowhatpro/.i-remember/data.json";
 
 pub fn init() {
     if !fs::metadata("/home/yellowhatpro/.i-remember").is_ok() {
-        fs::create_dir("~/.i-remember")
-            .unwrap_or_else(|e| panic!("{} {}", "error due to".red(), e)); //create folder
-
         //Create file
         let mut file = File::create(DATA_FILE).unwrap();
 
@@ -39,7 +35,7 @@ pub fn init() {
     }
 }
 
-pub fn get_pwd() ->String {
+pub fn get_pwd() -> String {
     env::current_dir().unwrap().to_string_lossy().to_string()
 }
 
@@ -56,27 +52,12 @@ pub fn get_remember_entities() -> Result<Vec<RememberEntity>> {
     Ok(remember_entities.data)
 }
 
-pub fn get_remember_entity_by_id(id: String ) -> Result<RememberEntity> {
+pub fn get_remember_entity_by_title(title: &str) -> Result<RememberEntity> {
     let remember_entities = match get_remember_entities() {
-        Ok(remember_entities) => {remember_entities}
-        Err(_) => {vec![]}
-    };
-    let re = remember_entities.iter()
-        .find(move |&remember_entity| remember_entity.id == id);
-    match re {
-        None => {
-            panic!("Could not find the entity")
+        Ok(remember_entities) => remember_entities,
+        Err(_) => {
+            vec![]
         }
-        Some(rem) => {
-            Ok(rem.to_owned())
-        }
-    }
-}
-
-pub fn get_remember_entity_by_title(title: &str) -> Result<RememberEntity>{
-    let remember_entities = match get_remember_entities() {
-        Ok(remember_entities) => {remember_entities}
-        Err(_) => {vec![]}
     };
     if let Some(re) = find_closest_name(title, remember_entities) {
         Ok(re)
@@ -88,7 +69,7 @@ pub fn get_remember_entity_by_title(title: &str) -> Result<RememberEntity>{
 fn find_closest_name(input: &str, names: Vec<RememberEntity>) -> Option<RememberEntity> {
     let mut closest_name = None;
     let mut min_distance = usize::MAX;
-    
+
     for re in names {
         let distance = levenshtein(input, re.title.as_str());
         if distance < min_distance {
@@ -103,14 +84,17 @@ pub fn execute_command(cmd: String) {
     let output = std::process::Command::new(which_shell())
         .arg("-c")
         .arg(cmd)
-        .output().expect("df");
+        .output()
+        .expect("df");
     println!("status: {}", output.status);
     io::stdout().write_all(&output.stdout).unwrap();
     io::stderr().write_all(&output.stderr).unwrap();
 }
 
 pub fn save_remember_entities(remember_entities: Vec<RememberEntity>) {
-    let config_file = structs::ConfigFile { data: remember_entities };
+    let config_file = structs::ConfigFile {
+        data: remember_entities,
+    };
     let json = serde_json::to_string(&config_file).unwrap();
 
     let mut file = File::create(DATA_FILE).unwrap();
@@ -119,8 +103,8 @@ pub fn save_remember_entities(remember_entities: Vec<RememberEntity>) {
 
 pub fn which_shell() -> String {
     match env::var_os("SHELL") {
-        None => { "".to_string() }
-        Some(sh) => { sh.to_string_lossy().to_string() }
+        None => "".to_string(),
+        Some(sh) => sh.to_string_lossy().to_string(),
     }
 }
 
@@ -143,11 +127,11 @@ pub fn read_from_sh_history(number_of_lines: usize) -> Vec<String> {
         "/usr/bin/zsh" => {
             let history_file_path = env!("HOME").to_string() + "/.zsh_history";
             read_shell_history_file(history_file_path, number_of_lines)
-        },
+        }
         "/usr/bin/bash" => {
             let history_file_path = env!("HOME").to_string() + "/.bash_history";
             read_shell_history_file(history_file_path, number_of_lines)
-        },
-        _ => vec![]
+        }
+        _ => vec![],
     }
 }
