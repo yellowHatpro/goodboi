@@ -1,6 +1,7 @@
 use clap::{Args, Parser, Subcommand};
-use i_remember_structs::RememberEntity;
 use serde::{Deserialize, Serialize};
+
+use crate::remember::remember_entity::RememberEntity;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ConfigFile {

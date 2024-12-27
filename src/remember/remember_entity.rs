@@ -1,14 +1,14 @@
+use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::fmt::Formatter;
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct RememberEntity  {
+pub struct RememberEntity {
     pub id: String,
     pub title: String,
     pub cmds: Vec<String>,
     pub description: String,
-    pub pwd: String
+    pub pwd: String,
 }
 
 impl fmt::Display for RememberEntity {

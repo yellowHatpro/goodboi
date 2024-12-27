@@ -1,10 +1,11 @@
+pub mod remember_entity;
 use crate::structs::{RecentCommand, RemoveCommand, RunCommand, SaveCommand, SearchCommand};
 use crate::utils;
 use crate::utils::get_pwd;
 use colorize::*;
-use i_remember_structs::RememberEntity;
+use remember_entity::RememberEntity;
 
-pub fn handle_save_remember_entity(save_command: SaveCommand) {
+pub async fn handle_save_remember_entity(save_command: SaveCommand, data_file: String) {
     let pwd = get_pwd();
     if save_command.title.len() < 1
         || save_command.description.len() < 1
@@ -13,7 +14,7 @@ pub fn handle_save_remember_entity(save_command: SaveCommand) {
         println!("{}", "Please provide some value".red());
         return;
     }
-    let mut remember_entities = match utils::get_remember_entities() {
+    let mut remember_entities = match utils::get_remember_entities(&data_file).await {
         Ok(remember_entities) => remember_entities,
         Err(_) => {
             vec![]
@@ -28,12 +29,17 @@ pub fn handle_save_remember_entity(save_command: SaveCommand) {
         pwd,
     };
     remember_entities.push(re);
-    utils::save_remember_entities(remember_entities);
+    utils::save_remember_entities(remember_entities, data_file).await;
     println!("{}", "Added command".green());
 }
 
-pub fn list() {
-    let remember_entities = utils::get_remember_entities().unwrap_or_else(|_| vec![]);
+pub async fn list(data_file: String) {
+    let remember_entities = match utils::get_remember_entities(&data_file).await {
+        Ok(remember_entities) => remember_entities,
+        Err(_) => {
+            vec![]
+        }
+    };
 
     if remember_entities.len() == 0 {
         println!("{}", "No commands".red());
@@ -44,14 +50,15 @@ pub fn list() {
     }
 }
 
-pub fn handle_recent_commands(rc: RecentCommand) {
+pub async fn handle_recent_commands(rc: RecentCommand) {
     utils::read_from_sh_history(rc.number_of_lines)
+        .await
         .iter()
         .for_each(|x| println!("{}", x.clone().green()))
 }
 
-pub fn handle_run_command(title: RunCommand) {
-    match utils::get_remember_entity_by_title(&title.title) {
+pub async fn handle_run_command(title: RunCommand, data_file: String) {
+    match utils::get_remember_entity_by_title(&title.title, data_file).await {
         Ok(re) => {
             if re.title != title.title {
                 println!(
@@ -63,7 +70,7 @@ pub fn handle_run_command(title: RunCommand) {
                 return;
             }
             for cmd in re.cmds {
-                utils::execute_command(cmd)
+                utils::execute_command(cmd).await;
             }
         }
         Err(_) => {
@@ -72,8 +79,8 @@ pub fn handle_run_command(title: RunCommand) {
     }
 }
 
-pub fn handle_search_command(title: SearchCommand) {
-    match utils::get_remember_entity_by_title(&title.title) {
+pub async fn handle_search_command(title: SearchCommand, data_file: String) {
+    match utils::get_remember_entity_by_title(&title.title, data_file).await {
         Ok(re) => {
             println!("{}", re);
         }
@@ -83,9 +90,9 @@ pub fn handle_search_command(title: SearchCommand) {
     }
 }
 
-pub fn handle_delete_remember_entity(title: RemoveCommand) {
+pub async fn handle_delete_remember_entity(title: RemoveCommand, data_file: String) {
     let title = title.title;
-    let mut remember_entities = match utils::get_remember_entities() {
+    let mut remember_entities = match utils::get_remember_entities(&data_file).await {
         Ok(remember_entities) => remember_entities,
         Err(_) => {
             vec![]
@@ -98,6 +105,6 @@ pub fn handle_delete_remember_entity(title: RemoveCommand) {
         return;
     }
     remember_entities.retain(|re| re.title != title);
-    utils::save_remember_entities(remember_entities);
+    utils::save_remember_entities(remember_entities, data_file).await;
     println!("{}", "Removed command".green());
 }
