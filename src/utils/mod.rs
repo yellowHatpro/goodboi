@@ -94,22 +94,40 @@ pub async fn read_shell_history_file(path: String, n: usize) -> Vec<String> {
     let reader = io::BufReader::new(file);
     let mut rolling_buffer: VecDeque<String> = VecDeque::with_capacity(n);
     let mut lines = reader.lines();
+
     while let Ok(Some(line)) = lines.next_line().await {
+        if line.starts_with(':') {
+            let parts: Vec<&str> = line.splitn(3, ':').collect();
+            if parts.len() >= 3 {
+                let command_part = parts[2];
+                if let Some(command) = command_part.split_once(';') {
+                    let formatted = command.1.trim().to_string();
+                    rolling_buffer.push_back(formatted);
+                    if rolling_buffer.len() > n {
+                        rolling_buffer.pop_front();
+                    }
+                    continue;
+                }
+            }
+        }
+
+        // Fallback for unparseable lines
         rolling_buffer.push_back(line);
         if rolling_buffer.len() > n {
             rolling_buffer.pop_front();
         }
     }
+
     rolling_buffer.into_iter().collect()
 }
 
 pub async fn read_from_sh_history(number_of_lines: usize) -> Vec<String> {
     match which_shell().as_str() {
-        "/usr/bin/zsh" => {
+        "/usr/bin/zsh" | "/bin/zsh" => {
             let history_file_path = env!("HOME").to_string() + "/.zsh_history";
             read_shell_history_file(history_file_path, number_of_lines).await
         }
-        "/usr/bin/bash" => {
+        "/usr/bin/bash" | "/bin/bash" => {
             let history_file_path = env!("HOME").to_string() + "/.bash_history";
             read_shell_history_file(history_file_path, number_of_lines).await
         }
