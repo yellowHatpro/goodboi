@@ -1,0 +1,15 @@
+[project]
+name = "{{project_name}}"
+version = "0.1.0"
+description = "{{project_description}}"
+
+[language]
+type = "{{language_type}}"
+package_manager = "{{package_manager}}"
+
+[dependencies]
+production = []
+development = []
+
+[services]
+enabled = []
