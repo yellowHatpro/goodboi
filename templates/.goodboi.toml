@@ -1,0 +1,27 @@
+[javascript]
+package_manager = "pnpm"
+language_type = "javascript"
+
+[typescript]
+package_manager = "pnpm"
+language_type = "typescript"
+
+[react]
+package_manager = "pnpm"
+language_type = "typescript"
+
+[nextjs]
+package_manager = "pnpm"
+language_type = "typescript"
+
+[rust]
+package_manager = "cargo"
+language_type = "rust"
+
+[python]
+package_manager = "uv"
+language_type = "python"
+
+[other]
+package_manager = "other"
+language_type = "other"

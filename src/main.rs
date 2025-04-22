@@ -9,7 +9,10 @@ use utils::fs_utils::create_config_folder;
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
 
-    create_config_folder().await;
+    if create_config_folder().await.is_err() {
+        log::error!("Failed to create config folder");
+        return Err(anyhow::anyhow!("Failed to create config folder"));
+    }
 
     let args = GoodboiArgs::parse();
     
