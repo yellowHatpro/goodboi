@@ -12,7 +12,6 @@ pub struct ProjectConfig {
 pub async fn handle_init() -> anyhow::Result<ProjectConfig> {
     println!("🚀 Welcome to goodboi! Let's create a new project.");
     
-    // Get current directory name as default project name
     let default_name = PathBuf::from(std::env::current_dir()?.file_name().unwrap())
         .to_string_lossy()
         .to_string();
